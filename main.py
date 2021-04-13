@@ -19,8 +19,8 @@ def get_full_names():
 
 
 def get_glcm_feature_array(patch):
-    patch_64 = (patch/np.max(patch)*63).astype('uint8')
-    glcm = greycomatrix(patch_64,distances,angles,64,True,True)
+    patch_64 = (patch/ np.max(patch) * 63).astype('uint8')
+    glcm = greycomatrix(patch_64, distances,angles,64,True,True)
     feature_vector = []
     for feature in feature_names:
         feature_vector.extend(list(greycoprops(glcm,feature).flatten()))
@@ -32,20 +32,25 @@ paths =glob(texture_folder + '\\*\\*.jpg')
 
 fil2 = [p.split(sep) for p in paths]
 _, categories, files = zip(*fil2)
-size = 128,128
+size = 128, 128
 
 features = []
 for category, infile in zip(categories,files):
     img=Image.open(join(texture_folder,category,infile))
-    xr=np.random.randint(0, img.width-size[0],10)
-    yr=np.random.randint(0, img.height-size[1],10)
+    xr=np.random.randint(0, img.width-size[0],99)
+    yr=np.random.randint(0, img.height-size[1],99)
     base_name, _ = splitext(infile)
+    n=0
     for i, (x, y) in enumerate(zip(xr,yr)):
+        print(n)
+        n=n+1
         img_sample = img.crop((x,y,x+size[0],y+size[1]))
-        img_sample.save(join(samples_folder,category,f'{base_name:s}_{i:02d}.jpg'))
+        img_sample.save(
+            join(samples_folder,category,f'{base_name:s}_{i:02d}.jpg'))
         img_grey = img.convert('L')
         feature_vector = get_glcm_feature_array(np.array(img_grey))
-        feature_vector.append(feature_vector)
+        feature_vector.append(category)
+        features.append(feature_vector)
 
 full_feature_names = get_full_names()
 full_feature_names.append('Category')
